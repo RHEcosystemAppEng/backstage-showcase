@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: lokeshrangineni
+spec:
+  profile:
+    displayName: Lokesh Rangineni # Can be any arbitrary value, will default to metadata.name value if not inserted.
+    email: lrangine@redhat.com
+    picture: https://avatars.githubusercontent.com/u/19699092?v=4
+  memberOf: []
