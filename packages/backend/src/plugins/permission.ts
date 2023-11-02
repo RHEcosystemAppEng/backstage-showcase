@@ -3,12 +3,26 @@ import {
   AuthorizeResult,
   PolicyDecision,
 } from '@backstage/plugin-permission-common';
-import { PermissionPolicy } from '@backstage/plugin-permission-node';
-import type { Router } from 'express';
-import type { PluginEnvironment } from '../types';
+import {
+  PermissionPolicy,
+  PolicyQuery,
+} from '@backstage/plugin-permission-node';
+import { Router } from 'express';
+import { PluginEnvironment } from '../types';
 
 class DefaultPermissionPolicy implements PermissionPolicy {
-  async handle(): Promise<PolicyDecision> {
+  async handle(request: PolicyQuery): Promise<PolicyDecision> {
+    // console.log(`SG:: -> permission.name=[${request.permission.name}]`)
+
+    if (request.permission.name === 'catalog.entity.delete') {
+      console.log(
+        `SG:: DENYing -> for permission.name=[${request.permission.name}]`,
+      );
+      return { result: AuthorizeResult.DENY };
+    }
+    console.log(
+      `SG:: ALLOWing -> for permission.name=[${request.permission.name}]`,
+    );
     return { result: AuthorizeResult.ALLOW };
   }
 }
