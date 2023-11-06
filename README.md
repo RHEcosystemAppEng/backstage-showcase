@@ -111,3 +111,6 @@ You can find the Backstage Showcase app running at <https://showcase.janus-idp.i
 For more information on our plugin offerings, consult the [Janus IDP Backstage Plugins](https://github.com/janus-idp/backstage-plugins) repo.
 
 Want to know more about Backstage, consult the [documentation](https://backstage.io/docs/overview/what-is-backstage) and [GitHub](https://github.com/backstage/backstage) repo.
+
+## Instructions to convert backend plugin to dynamic plugins
+Go to [converting backend plugin to dynamic plugin](./dynamic-plugin-demo.md)
