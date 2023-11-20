@@ -43,6 +43,7 @@ import {
   createDynamicPluginsConfigSecretEnumerator,
   gatherDynamicPluginsSchemas,
 } from './schemas';
+import sysInfo from './plugins/sys-info';
 
 // TODO(davidfestal): The following import is a temporary workaround for a bug
 // in the upstream @backstage/backend-plugin-manager package.
@@ -240,6 +241,15 @@ async function main() {
     router: search,
     logger,
   });
+
+  await addPlugin({
+    plugin: 'sys-info',
+    apiRouter,
+    createEnv,
+    router: sysInfo,
+    logger,
+  });
+
   await addPlugin({
     plugin: 'scaffolder',
     apiRouter,

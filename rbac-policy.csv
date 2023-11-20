@@ -1,0 +1,16 @@
+p, user:default/sgahlot, catalog.entity, read, deny
+p, user:default/sgahlot, catalog.entity.read, use, deny
+p, user:default/sgahlot, catalog.entity.create, use, allow
+p, user:default/sgahlot, catalog.entity.delete, use, deny
+p, user:default/sgahlot, catalog.entity.create, create, allow
+p, user:default/sgahlot, catalog.entity.delete, use, deny
+p, user:default/sgahlot, catalog.entity.delete, delete, deny
+p, user:default/sgahlot, sysInfo.read, read, deny
+p, user:default/guest, catalog.entity, read, deny
+p, user:default/guest, catalog.entity.read, use, deny
+p, user:default/guest, catalog.entity.create, use, deny
+p, user:default/guest, catalog.entity.delete, use, deny
+p, user:default/guest, catalog.entity.create, create, deny
+p, user:default/guest, catalog.entity.delete, use, deny
+p, user:default/guest, catalog.entity.delete, delete, deny
+p, user:default/guest, sysInfo.read, read, deny
