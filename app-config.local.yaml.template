@@ -1,0 +1,26 @@
+app:
+  title: Janus IDP Backstage Showcase - RBAC Policy Example
+  baseUrl: http://localhost:3000
+
+proxy:
+  skipInvalidProxies: true
+  endpoints: {}
+
+auth:
+  environment: development
+  providers:
+    github:
+      development:
+        clientId: ${AUTH_GITHUB_CLIENT_ID}
+        clientSecret: ${AUTH_GITHUB_CLIENT_SECRET}
+
+catalog:
+  import:
+    entityFilename: catalog-info.yaml
+    pullRequestBranchName: backstage-integration
+  rules:
+    - allow: [Component, System, Group, Resource, Location, Template, API]
+  locations:
+    # Note: integrations.github[].apps must be correctly configured to read GitHub locations
+    - type: file
+      target: ../../catalog-entities/all.yaml
