@@ -1,10 +1,17 @@
 # [Janus Showcase](https://showcase.janus-idp.io) - RBAC with a policy file
 
-[0]: https://quay.io/repository/janus-idp/backstage-showcase
+- [RBAC policy file](#rbac-policy-file)
+- [RBAC allow policy in action](#rbac-allow-policy-in-action)
+  - [Run the app](#run-the-app)
+  - [Login to GitHub](#login-to-github)
+  - [Verify the RBAC policy for allow effect](#verify-the-rbac-policy-for-allow-effect)
+- [RBAC deny policy in action](#rbac-deny-policy-in-action)
+  - [Change the policy effecgt](#change-the-policy-effect)
+  - [Verify the RBAC policy for deny effect](#verify-the-rbac-policy-for-allow-effect)
 
 ## RBAC policy file
 
-[Rbac policy file](./rbac-policy.csv) contains the RBAC policy as well as the group for which the policy is applied. The policy is given below as well (with slight modification for the userId):
+[Rbac policy file](./rbac-sample/rbac-policy.csv.template) contains the RBAC policy as well as the group for which the policy is applied. The policy is given below as well (with slight modification for the userId):
 
 ```
 p, role:default/red_hat_appeng, catalog-entity, read, allow
@@ -16,7 +23,7 @@ g, user:default/sgahlot, role:default/red_hat_appeng
 
 The policies are defined in the [Casbin rules format](https://casbin.org/docs/how-it-works). In the above example, we've defined four policies for `role:default/red_hat_appeng` and then added `user:default/sgahlot` to this role (essentially creating a group).
 
-## RBAC policy in action
+## RBAC allow policy in action
 
 We will be showing the use of RBAC policy for our custom backend plugin and for that we have added the following policy:
 
@@ -29,15 +36,15 @@ The plugin we are making use of is `sys-info-backend`. This plugin has the follo
 - `/system-info`
 - `/health`
 
-We have secured both of these endpoints with the RBAC policy shown above that `allow`s `read` (GET) action on this plugin.
+For this demo, we have secured only the `/system-info` endpoint with the RBAC policy shown above that `allow`s `read` (GET) action on this plugin.
 
 ### Run the app
 
-After checking out the code, run the following commands:
+After checking out the code, run the following commands from the root directory of the checked out code:
 
 ```
-cp app-config.local.yaml.template app-config.local.yaml
-cp rbac-policy.csv.template rbac-policy.csv
+cp rbac-sample/app-config.local.yaml.template app-config.local.yaml
+cp rbac-sample/rbac-policy.csv.template rbac-policy.csv
 ```
 
 Now, please modify the following files to use your own GitHub id:
@@ -52,6 +59,10 @@ Set the following environment variables (for your GitHub OAuth app):
 - `AUTH_GITHUB_CLIENT_ID`
 - `AUTH_GITHUB_CLIENT_SECRET`
 
+Set the following environment variable with a value of `true`:
+
+- `PERMISSION_ENABLED`
+
 Once the above changes are done, please run the following commands (_please make sure the yarn version is `1.22.19`_):
 
 ```
@@ -59,37 +70,116 @@ yarn install
 yarn start-dev
 ```
 
-## Getting Started
+### Login to GitHub
 
-Dependencies:
+If you are not already logged into the GitHub, please do so by selecting `Sign in using GitHub` on the Sign-In method page. It should take the AUTH environment variables into account and log you to GitHub.
 
-- [Node.js](https://nodejs.org/en/) 18
-- [yarn](https://classic.yarnpkg.com/en/docs/install#debian-stable)
+### Verify the RBAC policy for allow effect
 
-Information on running the showcase app can be found in our [Getting Started](https://github.com/janus-idp/backstage-showcase/blob/main/showcase-docs/getting-started.md) documentation. In the documentation is how to set up and run an instance of the showcase app locally. We plan to expand upon the documentation at a later point if there is enough interest in other methods for getting the app up and running.
+#### From the UI
 
-We are excited to see people wanting to contribute to our project and welcome anyone who wishes to participate. You are more than welcome to browse through our open issues and tackle anything you feel confident in working on.
+Now that you have logged in using your GitHub account, navibate to http://localhost:3000/system-info. This page should show System Info details along with the CPUs details similar to the image shown below:
 
-We also welcome non code contributions in the form of bug reporting and documentation writing. If you run across any bugs in the showcase app, please raise an issue here in [GitHub](https://github.com/janus-idp/backstage-showcase/issues/new?assignees=&labels=kind%2Fbug%2Cstatus%2Ftriage&template=bug.md).
+![System Info from UI](./rbac-sample/system_info_ui_allow.png)
 
-## Community, Discussion, and Support
+#### From the cli
 
-The Janus Community meeting is held biweekly on Thursday at 1:30 UTC via [Google Meet](https://meet.google.com/taq-tpfs-rre). An [agenda](https://docs.google.com/document/d/1RYkKxBRj6uMT5PTIugAuxAIYK9WxTkKgqdcdw1752Dc/edit?usp=sharing) can be found for the meeting and we encourage you to add any topics that you wish to discuss.
+Let us try to get the system information using `curl` command. Both the frontend as well as the `curl` command should be hitting the same policy when trying to query the system information endpoint.
 
-[Bugs](https://github.com/janus-idp/backstage-showcase/issues/new?assignees=&labels=kind%2Fbug%2Cstatus%2Ftriage&template=bug.md) should be filled out here on GitHub.
+First we need to grab the JWT from UI before we can use the `curl` command as the JWT contains the user that is used for authorization of the resource. Follow the given steps to get the JWT:
 
-Join the [community slack channel](https://join.slack.com/t/janus-idp/shared_invite/zt-1pxtehxom-fCFtF9rRe3vFqUiFFeAkmg) for a quick way to reach us or members of the community for discussion and collaboration.
+- Open up Developer Tools in Chrome
+- Select the **Network** tab in Developer Tools
+- Navigate again to the http://localhost:3000/system-info page
+- Once the page is refreshsed, click on **system-info** call and look for `Authorization` request header as shown below:
+  ![Authorization request header](./rbac-sample/system_info_dev_tools.png)
+- Set an environment variable named `TOKEN` with the value of the JWT retrieved in previous step
 
-Want to see a plugin in the showcase? Create an [issue](https://github.com/janus-idp/backstage-showcase/issues/new?assignees=&labels=kind%2Ffeature%2Cstatus%2Ftriage&template=feature.md) and we will discuss if it is right for the project.
+Now, run the following commands in a terminal (`jq` is optional in the curl command):
 
-Have an idea for a plugin? Submit a [proposal](https://github.com/janus-idp/backstage-plugins/issues/new?assignees=&labels=plugin&template=plugin.yaml&title=%F0%9F%94%8C+Plugin%3A+) to the Janus IDP Backstage Plugins repo.
+```
+export TOKEN='<JWT retrieved in previous steps>'
+curl "http://localhost:7007/api/sys-info/system-info" -H "Authorization: Bearer $TOKEN" | jq
+```
 
-## Resources
+The output from `curl` command will be similar to the image shown below:
 
-Our [blog](https://janus-idp.io/blog) is a great way to see what we are up to.
+![System Info using curl](./rbac-sample/system_info_curl_allow.png)
 
-You can find the Backstage Showcase app running at <https://showcase.janus-idp.io>.
+## RBAC deny policy in action
 
-For more information on our plugin offerings, consult the [Janus IDP Backstage Plugins](https://github.com/janus-idp/backstage-plugins) repo.
+### Change the policy effect
 
-Want to know more about Backstage, consult the [documentation](https://backstage.io/docs/overview/what-is-backstage) and [GitHub](https://github.com/backstage/backstage) repo.
+Now that we have demonstrated the `read` (GET call) access is allowed for the endpoint in system-information, we will change the policy to deny access to the system-information endpoint.
+
+Let us first set the following enviornment variables for our curl commands:
+
+```
+export USER='user:default/<CHANGE_TO_YOUR_GITHUB_ID>'   # Substitute with your github user id
+export ROLE='default/red_hat_appeng'
+export PERMISSION="sysInfo"
+export PERMISSION_INITIAL_EFFECT="allow"
+export PERMISSION_NEW_EFFECT="deny"
+```
+
+Let us first verify the existing policies for our role by running the following command:
+
+```
+curl "http://localhost:7007/api/permission/policies/role/$ROLE" -H "Authorization: Bearer $TOKEN" | jq
+```
+
+The above command should give an output similar to the image shown below:
+
+![Policies with allow effect](./rbac-sample/system_info_policies-01.png)
+
+To change the policy **effect** to `deny`, please run the following `curl` command:
+
+```
+curl -X PUT "http://localhost:7007/api/permission/policies/role/$ROLE" \
+    -d "{\"entityReference\": \"role:${ROLE}\", \
+         \"oldPolicy\": {\"permission\": \"${PERMISSION}\", \
+                         \"policy\": \"read\", \
+                         \"effect\":\"${PERMISSION_INITIAL_EFFECT}\"}, \
+         \"newPolicy\": {\"permission\": \"${PERMISSION}\", \
+                         \"policy\": \"read\", \
+                         \"effect\":\"${PERMISSION_NEW_EFFECT}\"}}" \
+    -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN"
+```
+
+Run the following command to verify that the permission has indeed changed for our role:
+
+```
+curl "http://localhost:7007/api/permission/policies/role/$ROLE" -H "Authorization: Bearer $TOKEN" | jq
+```
+
+The above command should give an output similar to the image shown below:
+
+![Policies with deny effect](./rbac-sample/system_info_policies-02.png)
+
+### Verify the RBAC policy for deny effect
+
+#### From the UI
+
+Now that you have logged in using your GitHub account, navibate to http://localhost:3000/system-info. This page should show `Backend data NOT found` message for both the System Info details as well as CPUs details similar to the image shown below:
+
+![System Info from UI](./rbac-sample/system_info_ui_deny.png)
+
+#### From the cli
+
+We should get a **deny** error from the backend when using the following `curl` command:
+
+```
+curl "http://localhost:7007/api/sys-info/system-info" -H "Authorization: Bearer $TOKEN" | jq
+```
+
+The output from `curl` command will be similar to the image shown below:
+
+![System Info using curl](./rbac-sample/system_info_curl_deny.png)
+
+## Code modification for RBAC
+
+TBD - NOT YET COMPLETE...
+
+## Conclusion
+
+Using the policy file with RBAC backend plugin is easy as well as it is very easy to add/change a policy using the RBAC backend plugin's REST endpoints. There are some more endpoints and their usage given in the [RBAC sample file](./rbac-sample/rbac-sample.sh).
