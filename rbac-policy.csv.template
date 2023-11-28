@@ -1,0 +1,5 @@
+p, role:default/red_hat_appeng, catalog-entity, read, allow
+p, role:default/red_hat_appeng, catalog.entity.create, read, allow
+p, role:default/red_hat_appeng, catalog.entity.create, create, allow
+p, role:default/red_hat_appeng, sysInfo, read, allow
+g, user:default/<CHANGE_TO_YOUR_GITHUB_ID>, role:default/red_hat_appeng

@@ -5,7 +5,11 @@ import { Table } from '@backstage/core-components';
 
 import { Box, Grid, Typography } from '@material-ui/core';
 
-import { configApiRef, useApi } from '@backstage/core-plugin-api';
+import {
+  configApiRef,
+  useApi,
+  identityApiRef,
+} from '@backstage/core-plugin-api';
 
 import {
   SysInfoData,
@@ -16,12 +20,20 @@ import {
 export const SystemInfoPage = () => {
   const config = useApi(configApiRef);
   const SYS_INFO_BACKEND_URL = 'backend.baseUrl';
+  const identityApi = useApi(identityApiRef);
 
   const { loading: isSysInfoLoading, value: sysInfoData } =
     useAsync(async (): Promise<SysInfoData> => {
+      const { token: idToken } = await identityApi.getCredentials();
       const backendUrl = config.getString(SYS_INFO_BACKEND_URL);
       const backendApiEndPoint = `${backendUrl}/api/sys-info/system-info`;
-      const systemInfoData = await fetch(backendApiEndPoint)
+      const systemInfoData = await fetch(backendApiEndPoint, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+      })
         .then(res => (res.ok ? res : Promise.reject(res)))
         .then(res => res.json());
 

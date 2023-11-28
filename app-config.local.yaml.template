@@ -14,6 +14,17 @@ auth:
         clientId: ${AUTH_GITHUB_CLIENT_ID}
         clientSecret: ${AUTH_GITHUB_CLIENT_SECRET}
 
+permission:
+  enabled: ${PERMISSION_ENABLED}
+  rbac:
+    policies-csv-file: ../../rbac-policy.csv
+    admin:
+      users:
+        - name: user:default/<CHANGE_TO_YOUR_GITHUB_ID>
+    database:
+      enabled: false
+
+
 catalog:
   import:
     entityFilename: catalog-info.yaml
@@ -24,3 +35,10 @@ catalog:
     # Note: integrations.github[].apps must be correctly configured to read GitHub locations
     - type: file
       target: ../../catalog-entities/all.yaml
+
+
+# To showcase the links in the UI for contactUs (email) and an external URL
+sysInfo:
+  baseUrl: www.someUrl.com
+  repoName: https://github.com/sgahlot/backstage-tutorial-nodejs
+  fileName: catalog-info.yaml

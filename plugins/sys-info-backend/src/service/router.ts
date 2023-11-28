@@ -52,9 +52,10 @@ export async function createRouter(
     // if (!req.headers.authorization) {
     //   res.status(403).json({ error: 'Mandatory auth header missing'});
     // } else {
-    for (const itemKey of config.getConfigArray('backend.auth.keys')) {
-      console.log(`KEY=[${itemKey.getOptionalString('secret')}]`);
-    }
+
+    // for (const itemKey of config.getConfigArray('backend.auth.keys')) {
+    //   console.log(`KEY=[${itemKey.getOptionalString('secret')}]`);
+    // }
 
     // const token = req.headers.authorization.split(' ')[1];
     // console.log(`AUTH TOKEN:: [${token}]`);
