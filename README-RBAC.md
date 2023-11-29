@@ -8,6 +8,8 @@
 - [RBAC deny policy in action](#rbac-deny-policy-in-action)
   - [Change the policy effecgt](#change-the-policy-effect)
   - [Verify the RBAC policy for deny effect](#verify-the-rbac-policy-for-allow-effect)
+- [Code modifications needed for RBAC](#code-modification-for-rbac)
+- [Conclusion](#conclusion)
 
 ## RBAC policy file
 
@@ -178,7 +180,38 @@ The output from `curl` command will be similar to the image shown below:
 
 ## Code modification for RBAC
 
-TBD - NOT YET COMPLETE...
+Following changes were done to the codebase to showcase this RBAC feature:
+
+- Added following in **packages/app/package.json** to the dependencies:
+  - `"@internal/plugin-system-info": "^0.1.0",`
+- Added following in **packages/backend/package.json** to the dependencies:
+  - `"@internal/plugin-sys-info-backend": "^0.1.0",`
+- Added following in **packages/app/src/components/AppBase/AppBase.tsx**:
+  ```
+  import { SystemInfoPage } from '@internal/plugin-system-info';    // with other imports
+  <Route path="/system-info" element={<SystemInfoPage />} />        // with other routes
+  ```
+- Added following in **packages/backend/src/index.ts**:
+
+  ```
+  import sysInfo from './plugins/sys-info';    // with other imports
+
+  // with other addPlugin statements
+  await addPlugin({
+    plugin: 'sys-info',
+    apiRouter,
+    createEnv,
+    router: sysInfo,
+    logger,
+  });
+  ```
+
+- Added a new file named **packages/backend/src/plugins/sys-info.ts**
+- Added custom backend plugin **plugins/sys-info-backend** with the RBAC
+- Added custom backend plugin **plugins/system-info** (to use the above mentioned backend plugin)
+- Added method in **plugins/sys-info-backend/src/service/router.ts** to check permission for a given resource:
+
+  ![checkPermission for resource](./rbac-sample/backend-router.ts_changes.png)
 
 ## Conclusion
 
