@@ -182,6 +182,8 @@ The output from `curl` command will be similar to the image shown below:
 
 Following changes were done to the codebase to showcase this RBAC feature:
 
+- Added [Janus-IDP RBAC](https://github.com/janus-idp/backstage-plugins/tree/main/plugins/rbac-backend) backend plugin using the following command:
+  - `yarn workspace backend add @janus-idp/backstage-plugin-rbac-backend`
 - Added following in **packages/app/package.json** to the dependencies:
   - `"@internal/plugin-system-info": "^0.1.0",`
 - Added following in **packages/backend/package.json** to the dependencies:
